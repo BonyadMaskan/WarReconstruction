@@ -599,50 +599,61 @@
                 ]
             };
             typeChart.setOption(optionType);
+            
+            // نمودار اقدامات میدانی و عملیاتی با ECharts برای امکان درج لیبل بیرون از دایره
+            let performanceChartDom = document.getElementById('performanceChart');
+            performanceChartDom.style.height = "255px";
+            let performanceChart = echarts.init(performanceChartDom);
+
+            let optionPerformance = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b} : {c} واحد',
+                    textStyle: { fontFamily: 'Vazirmatn', direction: 'rtl' }
+                },
+                legend: {
+                    bottom: 0,
+                    left: 'center',
+                    data: ['نوع ۱', 'نوع ۲ (جزئی)', 'نوع ۳ (درب و پنجره)'],
+                    textStyle: { fontFamily: 'Vazirmatn', fontSize: 11 }
+                },
+                color: ['#8b5cf6', '#f97316', '#06b6d4'], // استفاده از ۳ رنگ متمایز (بنفش، نارنجی، فیروزه‌ای)
+                series: [
+                    {
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '45%'],
+                        data: [
+                            { value: pr1, name: 'نوع ۱' },
+                            { value: pr2, name: 'نوع ۲ (جزئی)' },
+                            { value: pr3, name: 'نوع ۳ (درب و پنجره)' }
+                        ],
+                        label: {
+                            show: true,
+                            position: 'outside',
+                            color: '#000000', // رنگ فونت مشکی
+                            fontFamily: 'Vazirmatn',
+                            fontSize: 10,
+                            formatter: function(params) {
+                                return params.name + ':\n\n' + fa(params.value) + ' واحد';
+                            }
+                        },
+                        labelLine: {
+                            show: true,
+                            length: 15,
+                            length2: 20,
+                            smooth: true
+                        },
+                        emphasis: {
+                            itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' }
+                        }
+                    }
+                ]
+            };
+            performanceChart.setOption(optionPerformance);
         }
 
         if (typeof ApexCharts === 'undefined') return;
-
-        let pct1 = r1 > 0 ? Math.min(Math.round((pr1 / r1) * 100), 100) : 0;
-        let pct2 = r2 > 0 ? Math.min(Math.round((pr2 / r2) * 100), 100) : 0;
-        let pct3 = r3 > 0 ? Math.min(Math.round((pr3 / r3) * 100), 100) : 0;
-
-        new ApexCharts(document.querySelector("#performanceChart"), {
-            chart: { type: 'radialBar', height: 240 },
-            series: [pct1, pct2, pct3],
-            labels: ['نوع ۱ ', 'نوع ۲ (جزئی)', 'نوع ۳ (درب و پنجره)'],
-            colors: ['#a855f7', '#14b8a6', '#3b82f6'],
-            plotOptions: {
-                radialBar: {
-                    hollow: { size: '38%' },
-                    track: { background: '#f1f5f9', strokeWidth: '100%' },
-                    dataLabels: {
-                        name: { show: true, fontSize: '11px', fontFamily: 'inherit', fontWeight: '600', color: '#64748b', offsetY: -10 },
-                        value: { show: true, fontSize: '14px', fontFamily: 'inherit', fontWeight: '800', color: '#0f172a', offsetY: -2 },
-                        total: {
-                            show: true,
-                            label: 'پیشرفت',
-                            color: '#475569',
-                            fontFamily: 'inherit',
-                            fontWeight: '700',
-                            formatter: function () {
-                                let totalNeed = r1 + r2 + r3;
-                                if(totalNeed === 0) return '۰٪';
-                                return Math.round((repaired / totalNeed) * 100).toLocaleString('fa-IR') + '٪';
-                            }
-                        }
-                    }
-                }
-            },
-            legend: {
-                show: true, position: 'bottom', fontFamily: 'inherit', fontSize: '11px', labels: { colors: '#334155' },
-                formatter: function(seriesName, opts) {
-                    const exactVals = [pr1, pr2, pr3];
-                    const currentVal = (opts && opts.seriesIndex !== undefined) ? exactVals[opts.seriesIndex] : 0;
-                    return seriesName + ': ' + currentVal.toLocaleString('fa-IR') + ' واحد';
-                }
-            }
-        }).render();
 
         new ApexCharts(document.querySelector("#permitChart"), {
             chart: { type: 'bar', height: 215, toolbar: { show: false }, parentHeightOffset: 0 },
